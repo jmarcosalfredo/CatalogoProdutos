@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16.4
+    container_name: DataBase
+    environment:
+      POSTGRES_USER: dev
+      POSTGRES_PASSWORD: Senhaultrasecreta123
+      POSTGRES_DB: CatalogoProdutos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-catalogo-produtos:/var/lib/postgresql/data
+
+volumes:
+  postgres-catalogo-produtos:
