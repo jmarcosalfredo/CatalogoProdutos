@@ -17,6 +17,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwaggerConfig();
+    app.ConfigureExceptionHandler();
 }
 
 app.UseHttpsRedirection();
