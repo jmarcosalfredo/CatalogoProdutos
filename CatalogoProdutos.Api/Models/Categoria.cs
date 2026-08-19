@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace CatalogoProdutos.Api.Models
@@ -26,7 +27,6 @@ namespace CatalogoProdutos.Api.Models
         [Required]
         [StringLength(300)]
         public string? ImagemUrl { get; set; }
-
 
         public ICollection<Produto>? Produtos { get; set; }
     }
