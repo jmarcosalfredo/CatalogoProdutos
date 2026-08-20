@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,11 +14,11 @@ namespace CatalogoProdutos.Api.Controllers
     [Route("[controller]")]
     public class ProdutosController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProdutosRepository _repository;
 
-        public ProdutosController(AppDbContext context)
+        public ProdutosController(IProdutosRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         [HttpGet]
@@ -25,7 +26,7 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var response = await _context.Produtos.ToListAsync();
+                var response = await _repository.GetAsync();
 
                 if (response is null)
                 {
@@ -40,12 +41,12 @@ namespace CatalogoProdutos.Api.Controllers
             }
         }
 
-        [HttpGet("{id}", Name = "ObterProduto")]
+        [HttpGet("{id:int}", Name = "ObterProduto")]
         public async Task<ActionResult<Produto>> GetById(int id)
         {
             try
             {
-                var response = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
+                var response = await _repository.GetByIdAsync(id);
 
                 if (response is null)
                 {
@@ -69,8 +70,8 @@ namespace CatalogoProdutos.Api.Controllers
                 {
                     return BadRequest();
                 }
-                await _context.Produtos.AddAsync(novoProduto);
-                await _context.SaveChangesAsync();
+
+                await _repository.CreateAsync(novoProduto);
 
                 return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
             }
@@ -81,7 +82,7 @@ namespace CatalogoProdutos.Api.Controllers
 
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<ActionResult<Produto>> Put(int id, Produto produto)
         {
             try
@@ -91,14 +92,13 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                bool existe = await _context.Produtos.AnyAsync(p => p.ProdutoId == id);
-                if (!existe)
+                var existe = await _repository.GetByIdAsync(id);
+                if (existe is null)
                 {
                     return NotFound();
                 }
 
-                _context.Entry(produto).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
+                await _repository.UpdateAsync(produto);
 
                 return Ok(produto);
             }
@@ -108,20 +108,19 @@ namespace CatalogoProdutos.Api.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
             try
             {
-                var response = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
+                var produto = await _repository.GetByIdAsync(id);
 
-                if (response is null)
+                if (produto is null)
                 {
                     return NotFound();
                 }
 
-                _context.Produtos.Remove(response);
-                await _context.SaveChangesAsync();
+                await _repository.DeleteAsync(id);
 
                 return Ok();
             }

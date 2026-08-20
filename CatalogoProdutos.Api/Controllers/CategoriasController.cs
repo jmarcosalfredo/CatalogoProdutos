@@ -27,6 +27,12 @@ namespace CatalogoProdutos.Api.Controllers
             try
             {
                 var categorias = await _repository.GetAsync();
+
+                if (categorias is null)
+                {
+                    return NotFound();
+                }
+
                 return Ok(categorias);
             }
             catch (Exception)
@@ -83,6 +89,12 @@ namespace CatalogoProdutos.Api.Controllers
                 if (id != categoria.CategoriaId)
                 {
                     return BadRequest();
+                }
+
+                var existe = await _repository.GetByIdAsync(id);
+                if (existe is null)
+                {
+                    return NotFound();
                 }
 
                 await _repository.UpdateAsync(categoria);
