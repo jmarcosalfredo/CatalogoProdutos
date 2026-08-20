@@ -1,4 +1,6 @@
 using CatalogoProdutos.Api.Configs;
+using CatalogoProdutos.Api.Repositories;
+using CatalogoProdutos.Api.Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 builder.Services.AddDatabaseConfigurarion(builder.Configuration);
+builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 
 var app = builder.Build();
 

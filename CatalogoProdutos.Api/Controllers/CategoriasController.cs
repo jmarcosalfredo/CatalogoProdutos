@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,24 +14,11 @@ namespace CatalogoProdutos.Api.Controllers
     [Route("[controller]")]
     public class CategoriasController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoriaRepository _repository;
 
-        public CategoriasController(AppDbContext context)
+        public CategoriasController(ICategoriaRepository repository)
         {
-            _context = context;
-        }
-
-        [HttpGet("produtos")]
-        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriaProdutos()
-        {
-            try
-            {
-                return await _context.Categorias.Include(p => p.Produtos).ToListAsync();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
-            }
+            _repository = repository;
         }
 
         [HttpGet]
@@ -38,7 +26,8 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                return await _context.Categorias.ToListAsync();
+                var categorias = await _repository.GetAsync();
+                return Ok(categorias);
             }
             catch (Exception)
             {
@@ -46,19 +35,19 @@ namespace CatalogoProdutos.Api.Controllers
             }
         }
 
-        [HttpGet("{id}", Name = "ObterCategoria")]
+        [HttpGet("{id:int}", Name = "ObterCategoria")]
         public async Task<ActionResult<Produto>> Get(int id)
         {
             try
             {
-                var response = await _context.Categorias.FirstOrDefaultAsync(c => c.CategoriaId == id);
+                var categoria = await _repository.GetByIdAsync(id);
 
-                if (response is null)
+                if (categoria is null)
                 {
-                    return NotFound();
+                    return NotFound($"Categoria com o id= {id} não encontrada!");
                 }
 
-                return Ok(response);
+                return Ok(categoria);
             }
             catch (Exception)
             {
@@ -76,10 +65,9 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                await _context.Categorias.AddAsync(categoria);
-                await _context.SaveChangesAsync();
+                var novaCategoria = await _repository.CreateAsync(categoria);
 
-                return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
+                return Created();
             }
             catch (Exception)
             {
@@ -87,7 +75,7 @@ namespace CatalogoProdutos.Api.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<ActionResult<Categoria>> Put(int id, Categoria categoria)
         {
             try
@@ -97,15 +85,7 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                bool existe = await _context.Produtos.AnyAsync(c => c.CategoriaId == id);
-                if (!existe)
-                {
-                    return NotFound();
-                }
-
-                _context.Entry(categoria).State = EntityState.Modified;
-                await _context.SaveChangesAsync();
-
+                await _repository.UpdateAsync(categoria);
                 return Ok(categoria);
             }
             catch (Exception)
@@ -114,21 +94,20 @@ namespace CatalogoProdutos.Api.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<ActionResult> Delete(int id)
         {
             try
             {
-                var response = await _context.Categorias.FirstOrDefaultAsync(c => c.CategoriaId == id);
+                var categoria = await _repository.GetByIdAsync(id);
 
-                if (response is null)
+                if (categoria is null)
                 {
                     return NotFound();
                 }
 
-                _context.Categorias.Remove(response);
-                await _context.SaveChangesAsync();
-                return Ok();
+                await _repository.DeleteAsync(id);
+                return Ok(categoria);
             }
             catch (Exception)
             {
