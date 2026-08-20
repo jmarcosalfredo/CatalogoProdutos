@@ -12,7 +12,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDatabaseConfigurarion(builder.Configuration);
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
-builder.Services.AddScoped<IProdutosRepository, ProdutoRepository>();
+builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 var app = builder.Build();
 

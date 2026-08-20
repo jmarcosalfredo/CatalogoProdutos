@@ -14,11 +14,11 @@ namespace CatalogoProdutos.Api.Controllers
     [Route("[controller]")]
     public class ProdutosController : ControllerBase
     {
-        private readonly IProdutosRepository _repository;
+        private readonly IUnitOfWork _uof;
 
-        public ProdutosController(IProdutosRepository repository)
+        public ProdutosController(IUnitOfWork uof)
         {
-            _repository = repository;
+            _uof = uof;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var response = await _repository.GetAsync();
+                var response = await _uof.ProdutoRepository.GetAsync();
 
                 if (response is null)
                 {
@@ -46,7 +46,7 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var response = await _repository.GetByIdAsync(id);
+                var response = await _uof.ProdutoRepository.GetByIdAsync(id);
 
                 if (response is null)
                 {
@@ -71,7 +71,8 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                await _repository.CreateAsync(novoProduto);
+                await _uof.ProdutoRepository.CreateAsync(novoProduto);
+                await _uof.CommitAsync();
 
                 return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
             }
@@ -92,13 +93,14 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                var existe = await _repository.GetByIdAsync(id);
+                var existe = await _uof.ProdutoRepository.GetByIdAsync(id);
                 if (existe is null)
                 {
                     return NotFound();
                 }
 
-                await _repository.UpdateAsync(produto);
+                await _uof.ProdutoRepository.UpdateAsync(produto);
+                await _uof.CommitAsync();
 
                 return Ok(produto);
             }
@@ -113,14 +115,15 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var produto = await _repository.GetByIdAsync(id);
+                var produto = await _uof.ProdutoRepository.GetByIdAsync(id);
 
                 if (produto is null)
                 {
                     return NotFound();
                 }
 
-                await _repository.DeleteAsync(id);
+                await _uof.ProdutoRepository.DeleteAsync(id);
+                await _uof.CommitAsync();
 
                 return Ok();
             }

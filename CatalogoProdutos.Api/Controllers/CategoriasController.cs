@@ -14,11 +14,11 @@ namespace CatalogoProdutos.Api.Controllers
     [Route("[controller]")]
     public class CategoriasController : ControllerBase
     {
-        private readonly ICategoriaRepository _repository;
+        private readonly IUnitOfWork _uof;
 
-        public CategoriasController(ICategoriaRepository repository)
+        public CategoriasController(IUnitOfWork uof)
         {
-            _repository = repository;
+            _uof = uof;
         }
 
         [HttpGet]
@@ -26,7 +26,7 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var categorias = await _repository.GetAsync();
+                var categorias = await _uof.CategoriaRepository.GetAsync();
 
                 if (categorias is null)
                 {
@@ -46,7 +46,7 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var categoria = await _repository.GetByIdAsync(id);
+                var categoria = await _uof.CategoriaRepository.GetByIdAsync(id);
 
                 if (categoria is null)
                 {
@@ -71,7 +71,8 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                var novaCategoria = await _repository.CreateAsync(categoria);
+                var novaCategoria = await _uof.CategoriaRepository.CreateAsync(categoria);
+                await _uof.CommitAsync();
 
                 return Created();
             }
@@ -91,13 +92,14 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                var existe = await _repository.GetByIdAsync(id);
+                var existe = await _uof.CategoriaRepository.GetByIdAsync(id);
                 if (existe is null)
                 {
                     return NotFound();
                 }
 
-                await _repository.UpdateAsync(categoria);
+                await _uof.CategoriaRepository.UpdateAsync(categoria);
+                await _uof.CommitAsync();
                 return Ok(categoria);
             }
             catch (Exception)
@@ -111,14 +113,15 @@ namespace CatalogoProdutos.Api.Controllers
         {
             try
             {
-                var categoria = await _repository.GetByIdAsync(id);
+                var categoria = await _uof.CategoriaRepository.GetByIdAsync(id);
 
                 if (categoria is null)
                 {
                     return NotFound();
                 }
 
-                await _repository.DeleteAsync(id);
+                await _uof.CategoriaRepository.DeleteAsync(id);
+                await _uof.CommitAsync();
                 return Ok(categoria);
             }
             catch (Exception)

@@ -6,7 +6,7 @@ using CatalogoProdutos.Api.Models;
 
 namespace CatalogoProdutos.Api.Repositories
 {
-    public interface IProdutosRepository
+    public interface IProdutoRepository
     {
         Task<IEnumerable<Produto>> GetAsync();
         Task<Produto> GetByIdAsync(int id);

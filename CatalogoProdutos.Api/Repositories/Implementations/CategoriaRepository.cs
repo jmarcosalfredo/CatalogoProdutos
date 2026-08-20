@@ -19,12 +19,12 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
 
         public async Task<IEnumerable<Categoria>> GetAsync()
         {
-            return await _context.Categorias.ToListAsync();
+            return await _context.Categorias.AsNoTracking().ToListAsync();
         }
 
         public async Task<Categoria> GetByIdAsync(int id)
         {
-            var categoria = await _context.Categorias.FirstOrDefaultAsync(c => c.CategoriaId == id);
+            var categoria = await _context.Categorias.AsNoTracking().FirstOrDefaultAsync(c => c.CategoriaId == id);
 
             if (categoria is null)
             {
@@ -42,7 +42,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             }
 
             await _context.Categorias.AddAsync(categoria);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return categoria;
         }
@@ -55,7 +55,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             }
 
             _context.Entry(categoria).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return categoria;
         }
@@ -70,7 +70,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             }
 
             _context.Remove(categoria);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return categoria;
         }

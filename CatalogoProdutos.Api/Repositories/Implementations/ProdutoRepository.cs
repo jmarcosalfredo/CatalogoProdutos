@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CatalogoProdutos.Api.Repositories.Implementations
 {
-    public class ProdutoRepository : IProdutosRepository
+    public class ProdutoRepository : IProdutoRepository
     {
         private readonly AppDbContext _context;
 
@@ -19,12 +19,12 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
 
         public async Task<IEnumerable<Produto>> GetAsync()
         {
-            return await _context.Produtos.ToListAsync();
+            return await _context.Produtos.AsNoTracking().ToListAsync();
         }
 
         public async Task<Produto> GetByIdAsync(int id)
         {
-            var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.ProdutoId == id);
+            var produto = await _context.Produtos.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
 
             if (produto is null)
             {
@@ -42,7 +42,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             }
 
             await _context.Produtos.AddAsync(produto);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return produto;
         }
@@ -55,7 +55,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             }
 
             _context.Entry(produto).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return produto;
         }
@@ -70,7 +70,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             }
 
             _context.Remove(produto);
-            await _context.SaveChangesAsync();
+            //await _context.SaveChangesAsync();
 
             return produto;
         }
