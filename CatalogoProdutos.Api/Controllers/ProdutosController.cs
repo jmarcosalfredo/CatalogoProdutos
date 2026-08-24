@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Context;
+using CatalogoProdutos.Api.DTOs;
+using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
 using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
@@ -22,18 +24,20 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Produto>>> Get()
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
         {
             try
             {
-                var response = await _uof.ProdutoRepository.GetAsync();
+                var produtos = await _uof.ProdutoRepository.GetAsync();
 
-                if (response is null)
+                if (produtos is null)
                 {
                     return NotFound();
                 }
 
-                return Ok(response);
+                var produtosDto = produtos.ToProdutoDTOList();
+
+                return Ok(produtosDto);
             }
             catch (Exception)
             {
@@ -42,18 +46,20 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("{id:int}", Name = "ObterProduto")]
-        public async Task<ActionResult<Produto>> GetById(int id)
+        public async Task<ActionResult<ProdutoDTO>> GetById(int id)
         {
             try
             {
-                var response = await _uof.ProdutoRepository.GetByIdAsync(id);
+                var produto = await _uof.ProdutoRepository.GetByIdAsync(id);
 
-                if (response is null)
+                if (produto is null)
                 {
                     return NotFound();
                 }
 
-                return Ok(response);
+                var produtoDto = produto.ToProdutoDTO();
+
+                return Ok(produtoDto);
             }
             catch (Exception)
             {
@@ -62,19 +68,28 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Produto novoProduto)
+        public async Task<ActionResult<ProdutoDTO>> Post(ProdutoDTO produtoDto)
         {
             try
             {
-                if (novoProduto is null)
+                if (produtoDto is null)
                 {
                     return BadRequest();
                 }
 
-                await _uof.ProdutoRepository.CreateAsync(novoProduto);
+                var produto = produtoDto.ToProduto();
+
+                if (produto is null)
+                {
+                    return BadRequest();
+                }
+
+                await _uof.ProdutoRepository.CreateAsync(produto);
                 await _uof.CommitAsync();
 
-                return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto.ProdutoId }, novoProduto);
+                var novoProduto = produto.ToProdutoDTO();
+
+                return new CreatedAtRouteResult("ObterProduto", new { id = novoProduto?.ProdutoId }, novoProduto);
             }
             catch (Exception)
             {
@@ -84,25 +99,28 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<Produto>> Put(int id, Produto produto)
+        public async Task<ActionResult<ProdutoDTO>> Put(int id, ProdutoDTO produtoDto)
         {
             try
             {
-                if (id != produto.ProdutoId)
-                {
-                    return BadRequest();
-                }
-
-                var existe = await _uof.ProdutoRepository.GetByIdAsync(id);
-                if (existe is null)
+                if (id != produtoDto.ProdutoId)
                 {
                     return NotFound();
+                }
+
+                var produto = produtoDto.ToProduto();
+
+                if (produto is null)
+                {
+                    return BadRequest();
                 }
 
                 await _uof.ProdutoRepository.UpdateAsync(produto);
                 await _uof.CommitAsync();
 
-                return Ok(produto);
+                var produtoAtualizado = produto.ToProdutoDTO();
+
+                return Ok(produtoAtualizado);
             }
             catch (Exception)
             {
@@ -111,7 +129,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult<ProdutoDTO>> Delete(int id)
         {
             try
             {
@@ -125,7 +143,9 @@ namespace CatalogoProdutos.Api.Controllers
                 await _uof.ProdutoRepository.DeleteAsync(id);
                 await _uof.CommitAsync();
 
-                return Ok();
+                var produtoDto = produto.ToProdutoDTO();
+
+                return Ok(produtoDto);
             }
             catch (Exception)
             {

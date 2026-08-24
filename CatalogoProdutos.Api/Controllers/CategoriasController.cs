@@ -3,9 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Context;
+using CatalogoProdutos.Api.DTOs;
+using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
 using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogoProdutos.Api.Controllers
@@ -22,7 +25,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Categoria>>> Get()
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {
             try
             {
@@ -33,7 +36,9 @@ namespace CatalogoProdutos.Api.Controllers
                     return NotFound();
                 }
 
-                return Ok(categorias);
+                var categoriasDto = categorias.ToCategoriaDTOList();
+
+                return Ok(categoriasDto);
             }
             catch (Exception)
             {
@@ -42,7 +47,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
-        public async Task<ActionResult<Produto>> Get(int id)
+        public async Task<ActionResult<CategoriaDTO>> Get(int id)
         {
             try
             {
@@ -53,7 +58,9 @@ namespace CatalogoProdutos.Api.Controllers
                     return NotFound($"Categoria com o id= {id} não encontrada!");
                 }
 
-                return Ok(categoria);
+                var categoriaDto = categoria.ToCategoriaDTO();
+
+                return Ok(categoriaDto);
             }
             catch (Exception)
             {
@@ -62,10 +69,17 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post(Categoria categoria)
+        public async Task<ActionResult<CategoriaDTO>> Post(CategoriaDTO categoriaDto)
         {
             try
             {
+                if (categoriaDto is null)
+                {
+                    return BadRequest();
+                }
+
+                var categoria = categoriaDto.ToCategoria();
+
                 if (categoria is null)
                 {
                     return BadRequest();
@@ -83,24 +97,28 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<ActionResult<Categoria>> Put(int id, Categoria categoria)
+        public async Task<ActionResult<CategoriaDTO>> Put(int id, CategoriaDTO categoriaDto)
         {
             try
             {
-                if (id != categoria.CategoriaId)
-                {
-                    return BadRequest();
-                }
-
-                var existe = await _uof.CategoriaRepository.GetByIdAsync(id);
-                if (existe is null)
+                if (id != categoriaDto.CategoriaId)
                 {
                     return NotFound();
                 }
 
+                var categoria = categoriaDto.ToCategoria();
+
+                if (categoria is null)
+                {
+                    return BadRequest();
+                }
+
                 await _uof.CategoriaRepository.UpdateAsync(categoria);
                 await _uof.CommitAsync();
-                return Ok(categoria);
+
+                var categoriaAtualizada = categoria.ToCategoriaDTO();
+
+                return Ok(categoriaAtualizada);
             }
             catch (Exception)
             {
@@ -109,7 +127,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
-        public async Task<ActionResult> Delete(int id)
+        public async Task<ActionResult<CategoriaDTO>> Delete(int id)
         {
             try
             {
@@ -122,7 +140,10 @@ namespace CatalogoProdutos.Api.Controllers
 
                 await _uof.CategoriaRepository.DeleteAsync(id);
                 await _uof.CommitAsync();
-                return Ok(categoria);
+
+                var categoriaDto = categoria.ToCategoriaDTO();
+
+                return Ok(categoriaDto);
             }
             catch (Exception)
             {
