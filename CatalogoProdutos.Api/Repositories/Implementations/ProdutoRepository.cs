@@ -18,9 +18,17 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams)
+        //public async Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams)
+        //{
+        //    return _context.Produtos.AsNoTracking().ToList().OrderBy(p => p.Nome).Skip((produtosParams.PageNumber - 1) * produtosParams.PageSize).Take(produtosParams.PageSize).ToList();
+        //}
+
+        public PagedList<Produto> GetPaged(ProdutosParameters produtosParams)
         {
-            return _context.Produtos.AsNoTracking().ToList().OrderBy(p => p.Nome).Skip((produtosParams.PageNumber - 1) * produtosParams.PageSize).Take(produtosParams.PageSize).ToList();
+            var produtos = _context.Produtos.AsNoTracking().ToList().OrderBy(p => p.ProdutoId).AsQueryable();
+            var produtosPaginados = PagedList<Produto>.ToPagedList(produtos, produtosParams.PageNumber, produtosParams.PageSize);
+
+            return produtosPaginados;
         }
 
         public async Task<IEnumerable<Produto>> GetAsync()

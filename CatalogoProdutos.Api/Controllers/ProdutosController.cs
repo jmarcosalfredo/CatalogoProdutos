@@ -11,6 +11,7 @@ using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace CatalogoProdutos.Api.Controllers
 {
@@ -60,9 +61,21 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("pagination")]
-        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get([FromQuery] ProdutosParameters produtosParams)
+        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParams)
         {
-            var produtos = await _uof.ProdutoRepository.GetPagedAsync(produtosParams);
+            var produtos = _uof.ProdutoRepository.GetPaged(produtosParams);
+
+            var metadata = new
+            {
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious,
+            };
+
+            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
 
             var produtosDto = produtos.ToProdutoDTOList();
 

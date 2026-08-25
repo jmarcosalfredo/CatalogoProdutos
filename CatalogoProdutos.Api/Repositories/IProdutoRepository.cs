@@ -14,6 +14,7 @@ namespace CatalogoProdutos.Api.Repositories
         Task<Produto> CreateAsync(Produto produto);
         Task<Produto> UpdateAsync(Produto produto);
         Task<Produto> DeleteAsync(int id);
-        Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams);
+        //Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams);
+        PagedList<Produto> GetPaged(ProdutosParameters produtosParams);
     }
 }
