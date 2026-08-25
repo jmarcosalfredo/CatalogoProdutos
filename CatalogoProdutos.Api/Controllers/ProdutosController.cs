@@ -6,6 +6,7 @@ using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.DTOs;
 using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Pagination;
 using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -56,6 +57,16 @@ namespace CatalogoProdutos.Api.Controllers
             var response = produto.ToUpdateResponseDTO();
 
             return Ok(response);
+        }
+
+        [HttpGet("pagination")]
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get([FromQuery] ProdutosParameters produtosParams)
+        {
+            var produtos = await _uof.ProdutoRepository.GetPagedAsync(produtosParams);
+
+            var produtosDto = produtos.ToProdutoDTOList();
+
+            return Ok(produtosDto);
         }
 
         [HttpGet]

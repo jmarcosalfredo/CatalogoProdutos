@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogoProdutos.Api.Repositories.Implementations
@@ -15,6 +16,11 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
         public ProdutoRepository(AppDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams)
+        {
+            return _context.Produtos.AsNoTracking().ToList().OrderBy(p => p.Nome).Skip((produtosParams.PageNumber - 1) * produtosParams.PageSize).Take(produtosParams.PageSize).ToList();
         }
 
         public async Task<IEnumerable<Produto>> GetAsync()
