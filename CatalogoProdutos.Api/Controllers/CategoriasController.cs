@@ -49,32 +49,24 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("pagination")]
-        public ActionResult<PagedList<Categoria>> Get([FromQuery] CategoriasParameters categoriaParams)
+        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriaParams)
         {
             try
             {
                 var categorias = _uof.CategoriaRepository.GetPaged(categoriaParams);
-
-                var metadata = new
-                {
-                    categorias.TotalCount,
-                    categorias.PageSize,
-                    categorias.CurrentPage,
-                    categorias.TotalPages,
-                    categorias.HasNext,
-                    categorias.HasPrevious
-                };
-
-                Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
-
-                var categoriasDto = categorias.ToCategoriaDTOList();
-
-                return Ok(categoriasDto);
+                return ObterCategoriasPaged(categorias);
             }
             catch (Exception)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
             }
+        }
+
+        [HttpGet("filter/nome/pagination")]
+        public ActionResult<IEnumerable<CategoriaDTO>> GetFilteredByNome([FromQuery] CategoriasFiltroNome catParams)
+        {
+            var categoriasFiltradas = _uof.CategoriaRepository.GetPagedFilteredByName(catParams);
+            return ObterCategoriasPaged(categoriasFiltradas);
         }
 
         [HttpGet("{id:int}", Name = "ObterCategoria")]
@@ -180,6 +172,25 @@ namespace CatalogoProdutos.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
             }
+        }
+
+        private ActionResult<IEnumerable<CategoriaDTO>> ObterCategoriasPaged(PagedList<Categoria> categorias)
+        {
+            var metadata = new
+            {
+                categorias.TotalCount,
+                categorias.PageSize,
+                categorias.CurrentPage,
+                categorias.TotalPages,
+                categorias.HasNext,
+                categorias.HasPrevious
+            };
+
+            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
+
+            var categoriasDto = categorias.ToCategoriaDTOList();
+
+            return Ok(categoriasDto);
         }
     }
 }

@@ -83,5 +83,19 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
 
             return categoria;
         }
+
+        public PagedList<Categoria> GetPagedFilteredByName(CategoriasFiltroNome categoriasFiltroNomeParams)
+        {
+            var categorias = _context.Categorias.AsNoTracking().ToList().AsQueryable();
+
+            if (!string.IsNullOrEmpty(categoriasFiltroNomeParams.Nome))
+            {
+                categorias = categorias.Where(c => c.Nome!.Contains(categoriasFiltroNomeParams.Nome));
+            }
+
+            var categoriasFiltradasPaginadas = PagedList<Categoria>.ToPagedList(categorias, categoriasFiltroNomeParams.PageNumber, categoriasFiltroNomeParams.PageSize);
+
+            return categoriasFiltradasPaginadas;
+        }
     }
 }

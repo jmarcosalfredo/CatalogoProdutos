@@ -15,5 +15,6 @@ namespace CatalogoProdutos.Api.Repositories
         Task<Categoria> UpdateAsync(Categoria categoria);
         Task<Categoria> DeleteAsync(int id);
         PagedList<Categoria> GetPaged(CategoriasParameters categoriasParams);
+        PagedList<Categoria> GetPagedFilteredByName(CategoriasFiltroNome categoriasFiltroNomeParams);
     }
 }
