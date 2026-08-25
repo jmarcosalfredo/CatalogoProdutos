@@ -66,5 +66,56 @@ namespace CatalogoProdutos.Api.DTOs.Mappings
 
             return response;
         }
+
+        public static ProdutoDTOUpdateRequest? ProdutoToUpdateRequestDTO(this Produto produto)
+        {
+            if (produto is null)
+            {
+                return null;
+            }
+
+            var response = new ProdutoDTOUpdateRequest
+            {
+                Estoque = produto.Estoque,
+                DataCadastro = produto.DataCadastro
+            };
+
+            return response;
+        }
+
+        public static Produto? UpdateRequestDTOToProduto(this ProdutoDTOUpdateRequest produtoDtoUpdateRequest, Produto produto)
+        {
+            if (produtoDtoUpdateRequest is null || produto is null)
+            {
+                return null;
+            }
+
+            produto.Estoque = produtoDtoUpdateRequest.Estoque;
+            produto.DataCadastro = produtoDtoUpdateRequest.DataCadastro.ToUniversalTime();
+
+            return produto;
+        }
+
+        public static ProdutoDTOUpdateResponse? ToUpdateResponseDTO(this Produto produto)
+        {
+            if (produto is null)
+            {
+                return null;
+            }
+
+            var response = new ProdutoDTOUpdateResponse
+            {
+                ProdutoId = produto.ProdutoId,
+                Nome = produto.Nome,
+                Descricao = produto.Descricao,
+                Preco = produto.Preco,
+                ImagemUrl = produto.ImagemUrl,
+                Estoque = produto.Estoque,
+                DataCadastro = produto.DataCadastro,
+                CategoriaId = produto.CategoriaId,
+            };
+
+            return response;
+        }
     }
 }

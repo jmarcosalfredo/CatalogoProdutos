@@ -7,6 +7,7 @@ using CatalogoProdutos.Api.DTOs;
 using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
 using CatalogoProdutos.Api.Repositories;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,6 +22,40 @@ namespace CatalogoProdutos.Api.Controllers
         public ProdutosController(IUnitOfWork uof)
         {
             _uof = uof;
+        }
+
+        [HttpPatch("{id:int}/UpdatePartial")]
+        public async Task<ActionResult<ProdutoDTOUpdateResponse>> Patch(int id, JsonPatchDocument<ProdutoDTOUpdateRequest> patchProdutoDto)
+        {
+            if (patchProdutoDto is null || id <= 0)
+            {
+                return BadRequest();
+            }
+
+            var produto = await _uof.ProdutoRepository.GetByIdAsync(id);
+
+            if (produto is null)
+            {
+                return NotFound();
+            }
+
+            var produtoUpdateRequest = produto.ProdutoToUpdateRequestDTO()!;
+
+            patchProdutoDto.ApplyTo(produtoUpdateRequest, ModelState);
+
+            if (!ModelState.IsValid || !TryValidateModel(produtoUpdateRequest))
+            {
+                return BadRequest(ModelState);
+            }
+
+            produtoUpdateRequest.UpdateRequestDTOToProduto(produto);
+
+            await _uof.ProdutoRepository.UpdateAsync(produto);
+            await _uof.CommitAsync();
+
+            var response = produto.ToUpdateResponseDTO();
+
+            return Ok(response);
         }
 
         [HttpGet]
