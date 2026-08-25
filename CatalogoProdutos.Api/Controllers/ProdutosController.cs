@@ -66,22 +66,21 @@ namespace CatalogoProdutos.Api.Controllers
             try
             {
                 var produtos = _uof.ProdutoRepository.GetPaged(produtosParams);
+                return ObterProdutosPaged(produtos);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
+            }
+        }
 
-                var metadata = new
-                {
-                    produtos.TotalCount,
-                    produtos.PageSize,
-                    produtos.CurrentPage,
-                    produtos.TotalPages,
-                    produtos.HasNext,
-                    produtos.HasPrevious,
-                };
-
-                Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
-
-                var produtosDto = produtos.ToProdutoDTOList();
-
-                return Ok(produtosDto);
+        [HttpGet("filter/preco/pagination")]
+        public ActionResult<IEnumerable<ProdutoDTO>> GetFilteredByPreco([FromQuery] ProdutosFiltroPreco produtosFiltroParams)
+        {
+            try
+            {
+                var produtos = _uof.ProdutoRepository.GetFiteredByPreco(produtosFiltroParams);
+                return ObterProdutosPaged(produtos);
             }
             catch (Exception)
             {
@@ -217,6 +216,25 @@ namespace CatalogoProdutos.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
             }
+        }
+
+        private ActionResult<IEnumerable<ProdutoDTO>> ObterProdutosPaged(PagedList<Produto> produtos)
+        {
+            var metadata = new
+            {
+                produtos.TotalCount,
+                produtos.PageSize,
+                produtos.CurrentPage,
+                produtos.TotalPages,
+                produtos.HasNext,
+                produtos.HasPrevious,
+            };
+
+            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
+
+            var produtosDto = produtos.ToProdutoDTOList();
+
+            return Ok(produtosDto);
         }
     }
 }

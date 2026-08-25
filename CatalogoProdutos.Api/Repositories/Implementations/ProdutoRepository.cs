@@ -88,5 +88,31 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
 
             return produto;
         }
+
+        public PagedList<Produto> GetFiteredByPreco(ProdutosFiltroPreco produtosFiltroParams)
+        {
+            var produtos = _context.Produtos.AsNoTracking().ToList().AsQueryable();
+
+            if (produtosFiltroParams.Preco.HasValue && !string.IsNullOrEmpty(produtosFiltroParams.PrecoCriterio))
+            {
+                switch (produtosFiltroParams.PrecoCriterio.ToLowerInvariant())
+                {
+                    case "maior":
+                        produtos = produtos.Where(p => p.Preco > produtosFiltroParams.Preco.Value);
+                        break;
+                    case "menor":
+                        produtos = produtos.Where(p => p.Preco < produtosFiltroParams.Preco.Value);
+                        break;
+                    case "igual":
+                        produtos = produtos.Where(p => p.Preco == produtosFiltroParams.Preco.Value);
+                        break;
+                }
+                produtos = produtos.OrderBy(p => p.Preco);
+            }
+
+            var produtosPaginados = PagedList<Produto>.ToPagedList(produtos, produtosFiltroParams.PageNumber, produtosFiltroParams.PageSize);
+
+            return produtosPaginados;
+        }
     }
 }

@@ -16,5 +16,6 @@ namespace CatalogoProdutos.Api.Repositories
         Task<Produto> DeleteAsync(int id);
         //Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams);
         PagedList<Produto> GetPaged(ProdutosParameters produtosParams);
+        PagedList<Produto> GetFiteredByPreco(ProdutosFiltroPreco produtosFiltroParams);
     }
 }
