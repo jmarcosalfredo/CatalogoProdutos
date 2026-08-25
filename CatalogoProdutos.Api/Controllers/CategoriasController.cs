@@ -6,10 +6,12 @@ using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.DTOs;
 using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Pagination;
 using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace CatalogoProdutos.Api.Controllers
 {
@@ -35,6 +37,35 @@ namespace CatalogoProdutos.Api.Controllers
                 {
                     return NotFound();
                 }
+
+                var categoriasDto = categorias.ToCategoriaDTOList();
+
+                return Ok(categoriasDto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
+            }
+        }
+
+        [HttpGet("pagination")]
+        public ActionResult<PagedList<Categoria>> Get([FromQuery] CategoriasParameters categoriaParams)
+        {
+            try
+            {
+                var categorias = _uof.CategoriaRepository.GetPaged(categoriaParams);
+
+                var metadata = new
+                {
+                    categorias.TotalCount,
+                    categorias.PageSize,
+                    categorias.CurrentPage,
+                    categorias.TotalPages,
+                    categorias.HasNext,
+                    categorias.HasPrevious
+                };
+
+                Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
 
                 var categoriasDto = categorias.ToCategoriaDTOList();
 

@@ -63,23 +63,30 @@ namespace CatalogoProdutos.Api.Controllers
         [HttpGet("pagination")]
         public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParams)
         {
-            var produtos = _uof.ProdutoRepository.GetPaged(produtosParams);
-
-            var metadata = new
+            try
             {
-                produtos.TotalCount,
-                produtos.PageSize,
-                produtos.CurrentPage,
-                produtos.TotalPages,
-                produtos.HasNext,
-                produtos.HasPrevious,
-            };
+                var produtos = _uof.ProdutoRepository.GetPaged(produtosParams);
 
-            Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
+                var metadata = new
+                {
+                    produtos.TotalCount,
+                    produtos.PageSize,
+                    produtos.CurrentPage,
+                    produtos.TotalPages,
+                    produtos.HasNext,
+                    produtos.HasPrevious,
+                };
 
-            var produtosDto = produtos.ToProdutoDTOList();
+                Response.Headers.Append("Pagination", JsonConvert.SerializeObject(metadata));
 
-            return Ok(produtosDto);
+                var produtosDto = produtos.ToProdutoDTOList();
+
+                return Ok(produtosDto);
+            }
+            catch (Exception)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, "Ocorreu um erro interno no servidor.");
+            }
         }
 
         [HttpGet]

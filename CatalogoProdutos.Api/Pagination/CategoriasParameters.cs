@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace CatalogoProdutos.Api.Pagination
 {
-    public class ProdutosParameters : PaginationParameters
+    public class CategoriasParameters : PaginationParameters
     {
 
     }

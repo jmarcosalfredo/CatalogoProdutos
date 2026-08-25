@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace CatalogoProdutos.Api.Repositories.Implementations
@@ -15,6 +16,14 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
         public CategoriaRepository(AppDbContext context)
         {
             _context = context;
+        }
+
+        public PagedList<Categoria> GetPaged(CategoriasParameters categoriasParams)
+        {
+            var categorias = _context.Categorias.AsNoTracking().ToList().OrderBy(c => c.CategoriaId).AsQueryable();
+            var categoriasPaginadas = PagedList<Categoria>.ToPagedList(categorias, categoriasParams.PageNumber, categoriasParams.PageSize);
+
+            return categoriasPaginadas;
         }
 
         public async Task<IEnumerable<Categoria>> GetAsync()

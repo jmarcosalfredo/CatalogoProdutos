@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CatalogoProdutos.Api.Models;
+using CatalogoProdutos.Api.Pagination;
 
 namespace CatalogoProdutos.Api.Repositories
 {
@@ -13,5 +14,6 @@ namespace CatalogoProdutos.Api.Repositories
         Task<Categoria> CreateAsync(Categoria categoria);
         Task<Categoria> UpdateAsync(Categoria categoria);
         Task<Categoria> DeleteAsync(int id);
+        PagedList<Categoria> GetPaged(CategoriasParameters categoriasParams);
     }
 }
