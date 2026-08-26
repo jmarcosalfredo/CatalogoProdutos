@@ -49,11 +49,11 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("pagination")]
-        public ActionResult<IEnumerable<CategoriaDTO>> Get([FromQuery] CategoriasParameters categoriaParams)
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get([FromQuery] CategoriasParameters categoriaParams)
         {
             try
             {
-                var categorias = _uof.CategoriaRepository.GetPaged(categoriaParams);
+                var categorias = await _uof.CategoriaRepository.GetPagedAsync(categoriaParams);
                 return ObterCategoriasPaged(categorias);
             }
             catch (Exception)
@@ -63,9 +63,9 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("filter/nome/pagination")]
-        public ActionResult<IEnumerable<CategoriaDTO>> GetFilteredByNome([FromQuery] CategoriasFiltroNome catParams)
+        public async Task<ActionResult<IEnumerable<CategoriaDTO>>> GetFilteredByNome([FromQuery] CategoriasFiltroNome catParams)
         {
-            var categoriasFiltradas = _uof.CategoriaRepository.GetPagedFilteredByName(catParams);
+            var categoriasFiltradas = await _uof.CategoriaRepository.GetPagedFilteredByNameAsync(catParams);
             return ObterCategoriasPaged(categoriasFiltradas);
         }
 
@@ -136,7 +136,7 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                await _uof.CategoriaRepository.UpdateAsync(categoria);
+                _uof.CategoriaRepository.Update(categoria);
                 await _uof.CommitAsync();
 
                 var categoriaAtualizada = categoria.ToCategoriaDTO();
@@ -161,7 +161,7 @@ namespace CatalogoProdutos.Api.Controllers
                     return NotFound();
                 }
 
-                await _uof.CategoriaRepository.DeleteAsync(id);
+                _uof.CategoriaRepository.Delete(id);
                 await _uof.CommitAsync();
 
                 var categoriaDto = categoria.ToCategoriaDTO();

@@ -52,7 +52,7 @@ namespace CatalogoProdutos.Api.Controllers
 
             produtoUpdateRequest.UpdateRequestDTOToProduto(produto);
 
-            await _uof.ProdutoRepository.UpdateAsync(produto);
+            _uof.ProdutoRepository.Update(produto);
             await _uof.CommitAsync();
 
             var response = produto.ToUpdateResponseDTO();
@@ -61,11 +61,11 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("pagination")]
-        public ActionResult<IEnumerable<ProdutoDTO>> Get([FromQuery] ProdutosParameters produtosParams)
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get([FromQuery] ProdutosParameters produtosParams)
         {
             try
             {
-                var produtos = _uof.ProdutoRepository.GetPaged(produtosParams);
+                var produtos = await _uof.ProdutoRepository.GetPagedAsync(produtosParams);
                 return ObterProdutosPaged(produtos);
             }
             catch (Exception)
@@ -75,11 +75,11 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet("filter/preco/pagination")]
-        public ActionResult<IEnumerable<ProdutoDTO>> GetFilteredByPreco([FromQuery] ProdutosFiltroPreco produtosFiltroParams)
+        public async Task<ActionResult<IEnumerable<ProdutoDTO>>> GetFilteredByPreco([FromQuery] ProdutosFiltroPreco produtosFiltroParams)
         {
             try
             {
-                var produtos = _uof.ProdutoRepository.GetFiteredByPreco(produtosFiltroParams);
+                var produtos = await _uof.ProdutoRepository.GetFiteredByPrecoAsync(produtosFiltroParams);
                 return ObterProdutosPaged(produtos);
             }
             catch (Exception)
@@ -180,7 +180,7 @@ namespace CatalogoProdutos.Api.Controllers
                     return BadRequest();
                 }
 
-                await _uof.ProdutoRepository.UpdateAsync(produto);
+                _uof.ProdutoRepository.Update(produto);
                 await _uof.CommitAsync();
 
                 var produtoAtualizado = produto.ToProdutoDTO();
@@ -205,7 +205,7 @@ namespace CatalogoProdutos.Api.Controllers
                     return NotFound();
                 }
 
-                await _uof.ProdutoRepository.DeleteAsync(id);
+                _uof.ProdutoRepository.Delete(id);
                 await _uof.CommitAsync();
 
                 var produtoDto = produto.ToProdutoDTO();

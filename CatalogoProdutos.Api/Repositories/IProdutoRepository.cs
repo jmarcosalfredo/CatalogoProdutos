@@ -12,10 +12,10 @@ namespace CatalogoProdutos.Api.Repositories
         Task<IEnumerable<Produto>> GetAsync();
         Task<Produto> GetByIdAsync(int id);
         Task<Produto> CreateAsync(Produto produto);
-        Task<Produto> UpdateAsync(Produto produto);
-        Task<Produto> DeleteAsync(int id);
+        Produto Update(Produto produto);
+        Produto Delete(int id);
         //Task<IEnumerable<Produto>> GetPagedAsync(ProdutosParameters produtosParams);
-        PagedList<Produto> GetPaged(ProdutosParameters produtosParams);
-        PagedList<Produto> GetFiteredByPreco(ProdutosFiltroPreco produtosFiltroParams);
+        Task<PagedList<Produto>> GetPagedAsync(ProdutosParameters produtosParams);
+        Task<PagedList<Produto>> GetFiteredByPrecoAsync(ProdutosFiltroPreco produtosFiltroParams);
     }
 }

@@ -23,10 +23,13 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
         //    return _context.Produtos.AsNoTracking().ToList().OrderBy(p => p.Nome).Skip((produtosParams.PageNumber - 1) * produtosParams.PageSize).Take(produtosParams.PageSize).ToList();
         //}
 
-        public PagedList<Produto> GetPaged(ProdutosParameters produtosParams)
+        public async Task<PagedList<Produto>> GetPagedAsync(ProdutosParameters produtosParams)
         {
-            var produtos = _context.Produtos.AsNoTracking().ToList().OrderBy(p => p.ProdutoId).AsQueryable();
-            var produtosPaginados = PagedList<Produto>.ToPagedList(produtos, produtosParams.PageNumber, produtosParams.PageSize);
+            var produtos = await GetAsync();
+
+            var produtosOrdenados = produtos.OrderBy(p => p.ProdutoId).AsQueryable();
+
+            var produtosPaginados = PagedList<Produto>.ToPagedList(produtosOrdenados, produtosParams.PageNumber, produtosParams.PageSize);
 
             return produtosPaginados;
         }
@@ -61,7 +64,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             return produto;
         }
 
-        public async Task<Produto> UpdateAsync(Produto produto)
+        public Produto Update(Produto produto)
         {
             if (produto is null)
             {
@@ -74,7 +77,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             return produto;
         }
 
-        public async Task<Produto> DeleteAsync(int id)
+        public Produto Delete(int id)
         {
             var produto = _context.Produtos.Find(id);
 
@@ -89,9 +92,9 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
             return produto;
         }
 
-        public PagedList<Produto> GetFiteredByPreco(ProdutosFiltroPreco produtosFiltroParams)
+        public async Task<PagedList<Produto>> GetFiteredByPrecoAsync(ProdutosFiltroPreco produtosFiltroParams)
         {
-            var produtos = _context.Produtos.AsNoTracking().ToList().AsQueryable();
+            var produtos = await GetAsync();
 
             if (produtosFiltroParams.Preco.HasValue && !string.IsNullOrEmpty(produtosFiltroParams.PrecoCriterio))
             {
@@ -110,7 +113,7 @@ namespace CatalogoProdutos.Api.Repositories.Implementations
                 produtos = produtos.OrderBy(p => p.Preco);
             }
 
-            var produtosPaginados = PagedList<Produto>.ToPagedList(produtos, produtosFiltroParams.PageNumber, produtosFiltroParams.PageSize);
+            var produtosPaginados = PagedList<Produto>.ToPagedList(produtos.AsQueryable(), produtosFiltroParams.PageNumber, produtosFiltroParams.PageSize);
 
             return produtosPaginados;
         }
