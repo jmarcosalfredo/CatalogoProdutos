@@ -4,13 +4,12 @@ using CatalogoProdutos.Api.Repositories;
 using CatalogoProdutos.Api.Repositories.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
-
 // Add services to the container.
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddAuthorization();
-builder.Services.AddAuthentication("Bearer").AddJwtBearer();
+builder.Services.AddAuthenticationConfig(builder.Configuration);
 
 builder.Services.AddIdentityConfig();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
