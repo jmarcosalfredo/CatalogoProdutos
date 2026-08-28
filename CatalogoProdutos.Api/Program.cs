@@ -2,6 +2,7 @@ using CatalogoProdutos.Api.Configs;
 using CatalogoProdutos.Api.Context;
 using CatalogoProdutos.Api.Repositories;
 using CatalogoProdutos.Api.Repositories.Implementations;
+using CatalogoProdutos.Api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
@@ -19,6 +20,7 @@ builder.Services.AddDatabaseConfigurarion(builder.Configuration);
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<ITokenService, TokenService>();
 
 var app = builder.Build();
 
