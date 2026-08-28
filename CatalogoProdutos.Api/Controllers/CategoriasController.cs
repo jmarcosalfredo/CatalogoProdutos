@@ -8,6 +8,7 @@ using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
 using CatalogoProdutos.Api.Pagination;
 using CatalogoProdutos.Api.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,7 @@ namespace CatalogoProdutos.Api.Controllers
             _uof = uof;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CategoriaDTO>>> Get()
         {

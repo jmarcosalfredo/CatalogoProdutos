@@ -13,8 +13,12 @@ builder.Services.AddAuthorization();
 builder.Services.AddAuthenticationConfig(builder.Configuration);
 
 builder.Services.AddIdentityConfig();
+
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(options =>
+{
+    options.AddDocumentTransformer<JwtBearerConfig>();
+});
 
 builder.Services.AddDatabaseConfigurarion(builder.Configuration);
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
