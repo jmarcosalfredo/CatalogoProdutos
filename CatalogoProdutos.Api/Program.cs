@@ -9,10 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 
+builder.Services.AddIdentityConfig();
 builder.Services.AddAuthorization();
 builder.Services.AddAuthenticationConfig(builder.Configuration);
 
-builder.Services.AddIdentityConfig();
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi(options =>
@@ -37,6 +37,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 

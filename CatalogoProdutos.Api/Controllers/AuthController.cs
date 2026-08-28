@@ -168,5 +168,7 @@ namespace CatalogoProdutos.Api.Controllers
 
             return NoContent();
         }
+
+
     }
 }
