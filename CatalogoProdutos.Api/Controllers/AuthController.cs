@@ -44,6 +44,7 @@ namespace CatalogoProdutos.Api.Controllers
                 {
                     new Claim(ClaimTypes.Name, user.UserName!),
                     new Claim(ClaimTypes.Email, user.Email!),
+                    new Claim("id", user.UserName!),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 };
 
@@ -150,8 +151,8 @@ namespace CatalogoProdutos.Api.Controllers
             });
         }
 
-        [Authorize]
         [HttpPost]
+        [Authorize(Policy = "SuperAdminOnly")]
         [Route("revoke/{username}")]
         public async Task<IActionResult> Revoke(string username)
         {
@@ -170,6 +171,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "SuperAdminOnly")]
         [Route("create-role")]
         public async Task<IActionResult> CreateRole(string roleName)
         {
@@ -193,6 +195,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Policy = "SuperAdminOnly")]
         [Route("add-user-to-role")]
         public async Task<IActionResult> AddUserToRole(string email, string roleName)
         {

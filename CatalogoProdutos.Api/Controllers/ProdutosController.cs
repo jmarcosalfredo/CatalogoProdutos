@@ -8,6 +8,7 @@ using CatalogoProdutos.Api.DTOs.Mappings;
 using CatalogoProdutos.Api.Models;
 using CatalogoProdutos.Api.Pagination;
 using CatalogoProdutos.Api.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +90,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<IEnumerable<ProdutoDTO>>> Get()
         {
             try
@@ -194,6 +196,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<ProdutoDTO>> Delete(int id)
         {
             try

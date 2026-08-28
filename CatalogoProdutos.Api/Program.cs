@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers().AddNewtonsoftJson();
 
 builder.Services.AddIdentityConfig();
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorizationConfig();
 builder.Services.AddAuthenticationConfig(builder.Configuration);
 
 

@@ -152,6 +152,7 @@ namespace CatalogoProdutos.Api.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Policy = "AdminOnly")]
         public async Task<ActionResult<CategoriaDTO>> Delete(int id)
         {
             try
