@@ -169,6 +169,51 @@ namespace CatalogoProdutos.Api.Controllers
             return NoContent();
         }
 
+        [HttpPost]
+        [Route("create-role")]
+        public async Task<IActionResult> CreateRole(string roleName)
+        {
+            bool exists = await _roleManager.RoleExistsAsync(roleName);
 
+            if (!exists)
+            {
+                var roleResult = await _roleManager.CreateAsync(new IdentityRole(roleName));
+
+                if (roleResult.Succeeded)
+                {
+                    return StatusCode(StatusCodes.Status201Created, new LoginResponseModel { Status = "Success", Message = $"{roleName} adicionado com sucesso!" });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new LoginResponseModel { Status = "Error", Message = $"Falha ao adicionar {roleName}" });
+                }
+            }
+
+            return StatusCode(StatusCodes.Status409Conflict, new LoginResponseModel { Status = "Error", Message = $"{roleName} já existe!" });
+        }
+
+        [HttpPost]
+        [Route("add-user-to-role")]
+        public async Task<IActionResult> AddUserToRole(string email, string roleName)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            var role = await _roleManager.FindByNameAsync(roleName);
+
+            if (user != null && role != null)
+            {
+                var result = await _userManager.AddToRoleAsync(user, roleName);
+
+                if (result.Succeeded)
+                {
+                    return StatusCode(StatusCodes.Status200OK, new LoginResponseModel { Status = "Success", Message = $"Usuário {user}, adicionado a dicionado como {roleName}" });
+                }
+                else
+                {
+                    return StatusCode(StatusCodes.Status400BadRequest, new LoginResponseModel { Status = "Error", Message = $"Não foi possivel adicionar o {user} como {roleName}" });
+                }
+            }
+
+            return BadRequest(new { error = "Não foi possivel encontrar o usuário ou a role" });
+        }
     }
 }
