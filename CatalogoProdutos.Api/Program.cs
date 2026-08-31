@@ -23,6 +23,8 @@ builder.Services.AddOpenApi(options =>
     options.AddDocumentTransformer<JwtBearerConfig>();
 });
 
+builder.Services.AddRateLimiterConfig();
+
 builder.Services.AddDatabaseConfigurarion(builder.Configuration);
 builder.Services.AddScoped<ICategoriaRepository, CategoriaRepository>();
 builder.Services.AddScoped<IProdutoRepository, ProdutoRepository>();
@@ -40,6 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseRateLimiter();
 
 app.UseCors(CorsConfig.OrigensComAcessoPermitido);
 

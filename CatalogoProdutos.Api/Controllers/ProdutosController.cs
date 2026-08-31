@@ -11,6 +11,7 @@ using CatalogoProdutos.Api.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
@@ -18,6 +19,7 @@ namespace CatalogoProdutos.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
+    [EnableRateLimiting("fixedwindow")]
     public class ProdutosController : ControllerBase
     {
         private readonly IUnitOfWork _uof;

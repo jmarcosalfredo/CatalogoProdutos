@@ -10,11 +10,13 @@ using CatalogoProdutos.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace CatalogoProdutos.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [EnableRateLimiting("fixedwindow")]
     public class AuthController : ControllerBase
     {
         private readonly ITokenService _tokenService;
