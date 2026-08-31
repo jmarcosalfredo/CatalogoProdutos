@@ -9,6 +9,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers().AddNewtonsoftJson();
 
+
+builder.Services.AddCorsConfig();
+
 builder.Services.AddIdentityConfig();
 builder.Services.AddAuthorizationConfig();
 builder.Services.AddAuthenticationConfig(builder.Configuration);
@@ -37,6 +40,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(CorsConfig.OrigensComAcessoPermitido);
 
 app.UseAuthentication();
 
